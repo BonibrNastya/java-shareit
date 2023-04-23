@@ -5,11 +5,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.shareit.user.exception.DuplicateEmailException;
-import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.model.User;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
+import static java.util.Objects.isNull;
 
 @Component
 @Slf4j
@@ -56,12 +58,12 @@ public class UserStorageImpl implements UserStorage {
             }
         }
         User updateUser = new User(id, user.getEmail(), user.getName());
-        if (user.getEmail() == null) {
+        if (isNull(user.getEmail())) {
             updateUser.setEmail(users.get(id).getEmail());
         } else {
             updateUser.setEmail(user.getEmail());
         }
-        if (user.getName() == null) {
+        if (isNull(user.getName())) {
             updateUser.setName(users.get(id).getName());
         }
         users.remove(id);
