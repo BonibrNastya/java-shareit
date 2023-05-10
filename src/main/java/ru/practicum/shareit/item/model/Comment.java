@@ -1,9 +1,6 @@
 package ru.practicum.shareit.item.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NonNull;
+import lombok.*;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
@@ -12,6 +9,7 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor(force = true)
 @Entity
 @Table(name = "comments")
 public class Comment {
@@ -27,7 +25,4 @@ public class Comment {
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private User author;
     private LocalDateTime created;
-
-    public Comment() {
-    }
 }

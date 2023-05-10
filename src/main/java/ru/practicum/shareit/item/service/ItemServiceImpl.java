@@ -73,8 +73,10 @@ public class ItemServiceImpl implements ItemService {
         userItems.sort(Comparator.comparing(Item::getId));
         List<ItemWithDateDto> items = userItems.stream().map(ItemMapper::toItemWithDate)
                 .collect(Collectors.toList());
+        List<Long> itemsId = items.stream().map(ItemWithDateDto::getId).collect(Collectors.toList());
+        List<Booking> bookings = bookingRepository.findAllByItem_IdInAndStatus(itemsId, Status.APPROVED);
         for (ItemWithDateDto item : items) {
-            setDateToItem(item);
+            setDateToItem(bookings, item);
             Set<Comment> comments = commentRepository.findCommentsByItem_Id(item.getId());
             if (!comments.isEmpty()) {
                 item.setComments(comments.stream().map(CommentMapper::commentDto).collect(Collectors.toSet()));
@@ -89,8 +91,9 @@ public class ItemServiceImpl implements ItemService {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Вещь не найдена."));
         ItemWithDateDto itemWithDate = ItemMapper.toItemWithDate(item);
+        List<Booking> bookings = bookingRepository.findAllByItem_IdAndStatus(itemId, Status.APPROVED);
         if (item.getOwner().getId() == userId) {
-            setDateToItem(itemWithDate);
+            setDateToItem(bookings, itemWithDate);
         }
         Set<Comment> comments = commentRepository.findCommentsByItem_Id(itemId);
         if (!comments.isEmpty()) {
@@ -138,16 +141,18 @@ public class ItemServiceImpl implements ItemService {
                         "Добавление/обновление вещи невозможно."));
     }
 
-    private void setDateToItem(ItemWithDateDto item) {
-        Booking lastBooking = bookingRepository
-                .findAllByItem_IdAndStartBeforeOrderByStartDesc(item.getId(), LocalDateTime.now())
-                .stream().max(Comparator.comparing(Booking::getEnd)).orElse(null);
+    private void setDateToItem(List<Booking> bookings, ItemWithDateDto item) {
+        Booking lastBooking = bookings.stream()
+                .filter(b -> Objects.equals(b.getItem().getId(), item.getId()))
+                .filter(b -> b.getStart().isBefore(LocalDateTime.now()))
+                .sorted(Comparator.comparing(Booking::getStart).reversed())
+                .max(Comparator.comparing(Booking::getEnd)).orElse(null);
         if (nonNull(lastBooking)) {
             item.setLastBooking(BookingMapper.bookingItemDto(lastBooking));
         }
-        Booking nextBooking = bookingRepository
-                .findAllByItem_IdAndStartAfterOrderByEnd(item.getId(), LocalDateTime.now())
-                .stream().filter(b -> b.getStatus().equals(Status.APPROVED)).limit(1)
+        Booking nextBooking = bookings.stream()
+                .filter(b -> Objects.equals(b.getItem().getId(), item.getId()))
+                .filter(b -> b.getStart().isAfter(LocalDateTime.now()))
                 .min(Comparator.comparing(Booking::getStart)).orElse(null);
         if (nonNull(nextBooking)) {
             item.setNextBooking(BookingMapper.bookingItemDto(nextBooking));
