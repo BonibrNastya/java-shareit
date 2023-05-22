@@ -3,14 +3,12 @@ package ru.practicum.shareit.item.mapper;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemWithDateDto;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.request.storage.ItemRequestStorage;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ItemMapper {
-    private static ItemRequestStorage itemRequestStorage;
 
     public static ItemDto toItemDto(Item item) {
         return new ItemDto(
@@ -36,7 +34,6 @@ public class ItemMapper {
                 .description(itemDto.getDescription())
                 .available(itemDto.getAvailable())
                 .owner(user)
-                .request(itemDto.getRequest() != null ? itemRequestStorage.getById(itemDto.getRequest()) : null)
                 .build();
     }
 

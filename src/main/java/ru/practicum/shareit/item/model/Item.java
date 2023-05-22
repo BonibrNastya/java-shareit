@@ -31,6 +31,6 @@ public class Item {
     private Boolean available;
     @ManyToOne(cascade = CascadeType.ALL)
     private User owner;
-    @Transient
+    @ManyToOne(cascade = CascadeType.ALL)
     private ItemRequest request;
 }
