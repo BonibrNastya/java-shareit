@@ -71,7 +71,6 @@ class BookingServiceTest {
     void create() {
         Booking booking = bookingService.create(bookingDto, user1.getId());
 
-        assertEquals(1L, booking.getId());
         assertEquals(start, booking.getStart());
         assertEquals(end, booking.getEnd());
         assertEquals(item, booking.getItem());

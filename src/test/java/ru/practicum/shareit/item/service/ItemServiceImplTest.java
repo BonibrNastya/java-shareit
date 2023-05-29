@@ -121,7 +121,7 @@ class ItemServiceImplTest {
         Item savedItem = itemArgumentCaptor.getValue();
 
         assertEquals(actualItem, expectedItem);
-        assertEquals(1, savedItem.getRequest().getId());
+        assertEquals(item1.getId(), savedItem.getRequest().getId());
         assertEquals(itemRequest, savedItem.getRequest());
         verify(itemRepository).save(item1);
     }
@@ -322,7 +322,7 @@ class ItemServiceImplTest {
                 .thenReturn(Set.of(comment));
         ItemWithDateDto actualItem = itemService.getById(1L, 1L);
 
-        assertEquals(1L, actualItem.getId());
+        assertEquals(item1.getId(), actualItem.getId());
         assertEquals(item1.getName(), actualItem.getName());
         assertEquals(item1.getDescription(), actualItem.getDescription());
         assertEquals(item1.getAvailable(), actualItem.getAvailable());
@@ -340,7 +340,7 @@ class ItemServiceImplTest {
                 .thenReturn(Collections.emptySet());
         ItemWithDateDto actualItem = itemService.getById(1L, 1L);
 
-        assertEquals(1L, actualItem.getId());
+        assertEquals(item1.getId(), actualItem.getId());
         assertEquals(item1.getName(), actualItem.getName());
         assertEquals(item1.getDescription(), actualItem.getDescription());
         assertEquals(item1.getAvailable(), actualItem.getAvailable());

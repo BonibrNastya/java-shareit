@@ -45,8 +45,8 @@ class BookingServiceImplTest {
     private Item item;
     private Booking booking;
     private Booking booking2;
-    private static final LocalDateTime start = LocalDateTime.now();
-    private static final LocalDateTime end = LocalDateTime.now().plusHours(5);
+    private static final LocalDateTime START = LocalDateTime.now();
+    private static final LocalDateTime END = LocalDateTime.now().plusHours(5);
     @Captor
     private ArgumentCaptor<Booking> bookingArgumentCaptor;
 
@@ -71,16 +71,16 @@ class BookingServiceImplTest {
                 .build();
         booking = Booking.builder()
                 .id(1L)
-                .start(start)
-                .end(end)
+                .start(START)
+                .end(END)
                 .item(item)
                 .booker(user1)
                 .status(Status.APPROVED)
                 .build();
         booking2 = Booking.builder()
                 .id(1L)
-                .start(start)
-                .end(end)
+                .start(START)
+                .end(END)
                 .item(item)
                 .booker(user1)
                 .status(Status.REJECTED)
@@ -91,8 +91,8 @@ class BookingServiceImplTest {
     void create_whenValidBookingDto_returnBooking() {
         BookingDto bookingDto = new BookingDto();
         bookingDto.setItemId(item.getId());
-        bookingDto.setStart(start);
-        bookingDto.setEnd(end);
+        bookingDto.setStart(START);
+        bookingDto.setEnd(END);
         when(itemRepository.findById(anyLong()))
                 .thenReturn(Optional.of(item));
         when(userRepository.findById(anyLong()))
@@ -105,7 +105,7 @@ class BookingServiceImplTest {
         Booking savedBooking = bookingArgumentCaptor.getValue();
 
         assertEquals(booking, actualBooking);
-        assertEquals(1, savedBooking.getItem().getId());
+        assertEquals(item.getId(), savedBooking.getItem().getId());
         assertEquals(Status.WAITING, savedBooking.getStatus());
         verify(bookingRepository, times(1)).save(any());
     }
@@ -114,8 +114,8 @@ class BookingServiceImplTest {
     void create_whenBookingDtoNotValidDate_returnException() {
         BookingDto bookingDto = new BookingDto();
         bookingDto.setItemId(item.getId());
-        bookingDto.setStart(start);
-        bookingDto.setEnd(start);
+        bookingDto.setStart(START);
+        bookingDto.setEnd(START);
 
         String message = assertThrows(ResponseStatusException.class,
                 () -> bookingService.create(bookingDto, user1.getId())).getMessage();
@@ -127,8 +127,8 @@ class BookingServiceImplTest {
     void create_whenUserEqualsBooker_returnException() {
         BookingDto bookingDto = new BookingDto();
         bookingDto.setItemId(item.getId());
-        bookingDto.setStart(start);
-        bookingDto.setEnd(end);
+        bookingDto.setStart(START);
+        bookingDto.setEnd(END);
         when(itemRepository.findById(anyLong()))
                 .thenReturn(Optional.of(item));
 
@@ -143,8 +143,8 @@ class BookingServiceImplTest {
         item.setAvailable(false);
         BookingDto bookingDto = new BookingDto();
         bookingDto.setItemId(item.getId());
-        bookingDto.setStart(start);
-        bookingDto.setEnd(end);
+        bookingDto.setStart(START);
+        bookingDto.setEnd(END);
         when(itemRepository.findById(anyLong()))
                 .thenReturn(Optional.of(item));
         when((userRepository.findById(anyLong())))

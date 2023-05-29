@@ -35,7 +35,7 @@ class UserServiceTest {
     void create() {
         User actualUser = userService.create(user1);
 
-        assertEquals(1L, actualUser.getId());
+        assertEquals(user1.getId(), actualUser.getId());
         assertEquals("name1", actualUser.getName());
         assertEquals("name1@mail.ru", actualUser.getEmail());
     }

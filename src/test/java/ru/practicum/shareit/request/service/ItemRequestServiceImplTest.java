@@ -88,7 +88,7 @@ class ItemRequestServiceImplTest {
         ItemRequest savedRequest = itemRequestArgumentCaptor.getValue();
 
         assertEquals(itemRequest, actualRequest);
-        assertEquals(1, savedRequest.getId());
+        assertEquals(itemRequest.getId(), savedRequest.getId());
         assertEquals("requestDescription", savedRequest.getDescription());
         assertEquals(user1, savedRequest.getRequestor());
         verify(requestRepository, times(1)).save(any());

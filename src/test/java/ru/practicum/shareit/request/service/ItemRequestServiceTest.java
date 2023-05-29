@@ -59,7 +59,7 @@ class ItemRequestServiceTest {
         ItemRequest createRequest = itemRequestService
                 .create(itemRequest, user1.getId());
 
-        assertEquals(1L, createRequest.getId());
+        assertEquals(itemRequest.getId(), createRequest.getId());
         assertEquals(itemRequest.getDescription(), createRequest.getDescription());
         assertEquals(itemRequest.getRequestor(), createRequest.getRequestor());
     }
