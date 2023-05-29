@@ -35,7 +35,7 @@ class ItemRepositoryTest {
     private final Item item1 = new Item();
     private final Item item2 = new Item();
     private final ItemRequest itemRequest = new ItemRequest();
-    final Pageable page = PageRequest.of(0, 5);
+    private final Pageable page = PageRequest.of(0, 5);
 
     @BeforeEach
     public void setUp() {

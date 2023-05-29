@@ -45,7 +45,7 @@ class ItemRequestServiceImplTest {
     private User user1;
     private Item item;
     private ItemRequest itemRequest;
-    private static final LocalDateTime create = LocalDateTime.now();
+    private static final LocalDateTime CREATE = LocalDateTime.now();
     @Captor
     private ArgumentCaptor<ItemRequest> itemRequestArgumentCaptor;
 
@@ -72,7 +72,7 @@ class ItemRequestServiceImplTest {
                 .id(1L)
                 .description("requestDescription")
                 .requestor(user1)
-                .created(create)
+                .created(CREATE)
                 .build();
     }
 

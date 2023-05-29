@@ -35,8 +35,8 @@ class UserControllerTest {
     @InjectMocks
     private UserController userController;
     private final ObjectMapper mapper = new ObjectMapper();
-    private final String REQUEST_USERS = "/users";
-    private final String REQUEST_USER_WITH_ID = "/users/1";
+    private static final String REQUEST_USERS = "/users";
+    private static final String REQUEST_USER_WITH_ID = "/users/1";
     private MockMvc mvc;
     private User user;
 
