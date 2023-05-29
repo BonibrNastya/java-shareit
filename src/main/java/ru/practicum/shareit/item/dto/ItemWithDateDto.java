@@ -1,14 +1,14 @@
 package ru.practicum.shareit.item.dto;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.NonNull;
+import lombok.*;
 import ru.practicum.shareit.booking.dto.BookingItemDto;
 
 import java.util.Set;
 
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor(force = true)
 public class ItemWithDateDto {
     private long id;
     @NonNull

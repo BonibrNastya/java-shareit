@@ -35,6 +35,8 @@ class UserControllerTest {
     @InjectMocks
     private UserController userController;
     private final ObjectMapper mapper = new ObjectMapper();
+    private final String REQUEST_USERS = "/users";
+    private final String REQUEST_USER_WITH_ID = "/users/1";
     private MockMvc mvc;
     private User user;
 
@@ -51,9 +53,10 @@ class UserControllerTest {
     @SneakyThrows
     @Test
     void createUser() {
-        when(userService.create(any())).thenReturn(user);
+        when(userService.create(any()))
+                .thenReturn(user);
 
-        mvc.perform(post("/users")
+        mvc.perform(post(REQUEST_USERS)
                         .content(mapper.writeValueAsString(user))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -62,6 +65,8 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.id", is(user.getId()), Long.class))
                 .andExpect(jsonPath("$.email", is(user.getEmail())))
                 .andExpect(jsonPath("$.name", is(user.getName())));
+
+        verify(userService, times(1)).create(eq(user));
     }
 
     @SneakyThrows
@@ -75,14 +80,14 @@ class UserControllerTest {
                 .name("name2")
                 .build();
 
-        mvc.perform(post("/users")
+        mvc.perform(post(REQUEST_USERS)
                         .content(mapper.writeValueAsString(withoutEmailUser))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
 
-        mvc.perform(post("/users")
+        mvc.perform(post(REQUEST_USERS)
                         .content(mapper.writeValueAsString(withWrongEmailUser))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -95,9 +100,10 @@ class UserControllerTest {
     @SneakyThrows
     @Test
     void getAllUsers_whenListUsersNotNull_returnOkAndListUsers() {
-        when(userService.getAll()).thenReturn(List.of(user));
+        when(userService.getAll())
+                .thenReturn(List.of(user));
 
-        mvc.perform(get("/users"))
+        mvc.perform(get(REQUEST_USERS))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].id", is(user.getId()), Long.class))
@@ -108,18 +114,20 @@ class UserControllerTest {
     @SneakyThrows
     @Test
     void getAllUsers_WhenListUsersIsNull_returnOk() {
-        when(userService.getAll()).thenReturn(new ArrayList<>());
+        when(userService.getAll())
+                .thenReturn(new ArrayList<>());
 
-        mvc.perform(get("/users"))
+        mvc.perform(get(REQUEST_USERS))
                 .andExpect(status().isOk());
     }
 
     @SneakyThrows
     @Test
     void getUserById() {
-        when(userService.getById(anyLong())).thenReturn(user);
+        when(userService.getById(anyLong()))
+                .thenReturn(user);
 
-        mvc.perform(get("/users/1"))
+        mvc.perform(get(REQUEST_USER_WITH_ID))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(user.getId()), Long.class))
                 .andExpect(jsonPath("$.email", is(user.getEmail())))
@@ -134,9 +142,10 @@ class UserControllerTest {
                 .email("update@email.ru")
                 .name("update")
                 .build();
-        when(userService.update(any(), anyLong())).thenReturn(updateUser);
+        when(userService.update(any(), anyLong()))
+                .thenReturn(updateUser);
 
-        mvc.perform(patch("/users/1")
+        mvc.perform(patch(REQUEST_USER_WITH_ID)
                         .content(mapper.writeValueAsString(user))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -145,12 +154,13 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.id", is(updateUser.getId()), Long.class))
                 .andExpect(jsonPath("$.email", is(updateUser.getEmail())))
                 .andExpect(jsonPath("$.name", is(updateUser.getName())));
+        verify(userService, times(1)).update(eq(user), anyLong());
     }
 
     @SneakyThrows
     @Test
     void deleteUser() {
-        mvc.perform(delete("/users/1")
+        mvc.perform(delete(REQUEST_USER_WITH_ID)
                         .content(mapper.writeValueAsString(user))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)

@@ -77,6 +77,7 @@ class UserServiceImplTest {
 
         String message = assertThrows(ResponseStatusException.class,
                 () -> userService.getById(0L)).getMessage();
+
         assertEquals("404 NOT_FOUND \"Пользователь не найден.\"", message);
     }
 

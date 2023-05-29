@@ -19,7 +19,7 @@ public class Comment {
     @Column(nullable = false)
     private String text;
     @NonNull
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Item item;
     @NonNull
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)

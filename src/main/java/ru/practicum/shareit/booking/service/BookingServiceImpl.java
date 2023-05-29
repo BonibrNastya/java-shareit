@@ -19,6 +19,8 @@ import ru.practicum.shareit.user.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static java.util.Objects.isNull;
+
 @Service
 @RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
@@ -28,6 +30,9 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public Booking create(BookingDto bookingDto, long userId) {
+        if (isNull(bookingDto.getStart()) || isNull(bookingDto.getEnd())) {
+            throw new ResponseStatusException((HttpStatus.BAD_REQUEST));
+        }
         if (bookingDto.getEnd().isBefore(bookingDto.getStart()) ||
                 bookingDto.getStart().isAfter(bookingDto.getEnd()) ||
                 bookingDto.getStart().isEqual(bookingDto.getEnd())) {
