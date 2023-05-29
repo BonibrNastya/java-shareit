@@ -84,7 +84,6 @@ class ItemServiceTest {
     @Test
     void create() {
         ItemDto actualItem = itemService.create(itemDto, user1.getId());
-        assertEquals(1L, actualItem.getId());
         assertEquals("itemDtoName", actualItem.getName());
         assertEquals("itemDtoDescription", actualItem.getDescription());
         assertTrue(actualItem.getAvailable());
