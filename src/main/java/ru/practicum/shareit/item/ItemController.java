@@ -35,8 +35,10 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemWithDateDto> getAll(@RequestHeader(REQUEST_HEADER) Long userId) {
-        return itemService.getAll(userId);
+    public List<ItemWithDateDto> getAll(@RequestHeader(REQUEST_HEADER) Long userId,
+                                        @RequestParam(defaultValue = "0") int from,
+                                        @RequestParam(defaultValue = "10") int size) {
+        return itemService.getAll(userId, from, size);
     }
 
     @GetMapping("{id}")
@@ -46,8 +48,10 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public List<ItemDto> search(@RequestParam String text) {
-        return itemService.searchItem(text);
+    public List<ItemDto> search(@RequestParam String text,
+                                @RequestParam(defaultValue = "0") int from,
+                                @RequestParam(defaultValue = "10") int size) {
+        return itemService.searchItem(text, from, size);
     }
 
     @PostMapping("/{id}/comment")

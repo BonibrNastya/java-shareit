@@ -38,8 +38,9 @@ CREATE TABLE IF NOT EXISTS requests
     description VARCHAR(255) NOT NULL,
     requestor_id BIGINT NOT NULL
     CONSTRAINT requests_requestor_id_fk
-    REFERENCES users (id) ON DELETE CASCADE
-);
+    REFERENCES users (id) ON DELETE CASCADE,
+    created TIMESTAMP WITHOUT TIME ZONE
+    );
 
 CREATE TABLE IF NOT EXISTS comments
 (

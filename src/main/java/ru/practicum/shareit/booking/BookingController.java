@@ -44,14 +44,18 @@ public class BookingController {
 
     @GetMapping
     public List<Booking> getAllByState(@RequestHeader(REQUEST_HEADER) Long userId,
-                                       @Valid @RequestParam(defaultValue = "ALL") State state) {
-        return bookingService.getAllByState(new BookingStateDto(userId, state));
+                                       @Valid @RequestParam(defaultValue = "ALL") State state,
+                                       @RequestParam(defaultValue = "0") int from,
+                                       @RequestParam(defaultValue = "10") int size) {
+        return bookingService.getAllByState(new BookingStateDto(userId, state), from, size);
     }
 
     @GetMapping("/owner")
     public List<Booking> getAllByOwner(@RequestHeader(REQUEST_HEADER) Long userId,
-                                       @RequestParam(defaultValue = "ALL") State state) {
-        return bookingService.getAllByOwner(new BookingStateDto(userId, state));
+                                       @RequestParam(defaultValue = "ALL") State state,
+                                       @RequestParam(defaultValue = "0") int from,
+                                       @RequestParam(defaultValue = "10") int size) {
+        return bookingService.getAllByOwner(new BookingStateDto(userId, state), from, size);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)

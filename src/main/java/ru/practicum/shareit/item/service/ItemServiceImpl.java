@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -19,6 +20,7 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.request.repository.RequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -37,11 +39,17 @@ public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
+    private final RequestRepository requestRepository;
 
     @Override
     public ItemDto create(ItemDto itemDto, long userId) {
         User user = getUserOrException(userId);
-        Item item = itemRepository.save(ItemMapper.toItem(itemDto, user));
+        Item item = ItemMapper.toItem(itemDto, user);
+        Long requestId = itemDto.getRequestId();
+        if (nonNull(requestId)) {
+            item.setRequest(requestRepository.findById(requestId).get());
+        }
+        item = itemRepository.save(item);
         log.info("Создана вещь {}.", item.getName());
         return ItemMapper.toItemDto(item);
     }
@@ -68,22 +76,26 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemWithDateDto> getAll(long id) {
-        List<Item> userItems = itemRepository.findByOwnerId(id);
-        userItems.sort(Comparator.comparing(Item::getId));
-        List<ItemWithDateDto> items = userItems.stream().map(ItemMapper::toItemWithDate)
-                .collect(Collectors.toList());
-        List<Long> itemsId = items.stream().map(ItemWithDateDto::getId).collect(Collectors.toList());
-        List<Booking> bookings = bookingRepository.findAllByItem_IdInAndStatus(itemsId, Status.APPROVED);
-        for (ItemWithDateDto item : items) {
-            setDateToItem(bookings, item);
-            Set<Comment> comments = commentRepository.findCommentsByItem_Id(item.getId());
-            if (!comments.isEmpty()) {
-                item.setComments(comments.stream().map(CommentMapper::commentDto).collect(Collectors.toSet()));
+    public List<ItemWithDateDto> getAll(long id, int from, int size) {
+        if (from >= 0 && size > 0) {
+            PageRequest page = PageRequest.of(from > 0 ? from / size : 0, size);
+            List<ItemWithDateDto> items = itemRepository.findByOwnerId(id, page)
+                    .map(ItemMapper::toItemWithDate)
+                    .getContent();
+            List<Long> itemsId = items.stream().map(ItemWithDateDto::getId).collect(Collectors.toList());
+            List<Booking> bookings = bookingRepository.findAllByItem_IdInAndStatus(itemsId, Status.APPROVED);
+            for (ItemWithDateDto item : items) {
+                setDateToItem(bookings, item);
+                Set<Comment> comments = commentRepository.findCommentsByItem_Id(item.getId());
+                if (!comments.isEmpty()) {
+                    item.setComments(comments.stream().map(CommentMapper::commentDto).collect(Collectors.toSet()));
+                }
             }
+            log.info("Получение списка вещей пользователя с id = {}.", id);
+            return items;
+        } else {
+            throw new ArithmeticException("Неверный индекс или количество элементов.");
         }
-        log.info("Получение списка вещей пользователя с id = {}.", id);
-        return items;
     }
 
     @Override
@@ -106,13 +118,19 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> searchItem(String query) {
-        log.info("Поиск вещи, содержащей {}.", query);
-        if (query.isEmpty()) {
-            return new ArrayList<>();
+    public List<ItemDto> searchItem(String query, int from, int size) {
+        if (from >= 0 && size > 0) {
+            PageRequest page = PageRequest.of(from > 0 ? from / size : 0, size);
+            log.info("Поиск вещи, содержащей {}.", query);
+            if (query.isEmpty()) {
+                return new ArrayList<>();
+            }
+            return ItemMapper.toItemDto(itemRepository
+                    .findAllByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndAvailableIsTrue(query,
+                            query, page).getContent());
+        } else {
+            throw new ArithmeticException("Неверный индекс или количество элементов.");
         }
-        return ItemMapper.toItemDto(itemRepository
-                .findAllByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndAvailableIsTrue(query, query));
     }
 
     @Override
@@ -135,7 +153,7 @@ public class ItemServiceImpl implements ItemService {
         }
     }
 
-    public User getUserOrException(long userId) {
+    private User getUserOrException(long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден. " +
                         "Добавление/обновление вещи невозможно."));
