@@ -25,7 +25,6 @@ services:
       - SPRING_DATASOURCE_USERNAME=shareit
       - SPRING_DATASOURCE_PASSWORD=shareit
       - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8888
-      - TZ=Europe/Moscow
 
   db:
     image: postgres:14-alpine
